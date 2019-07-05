@@ -73,7 +73,7 @@ class eventmembers_facebook_login extends Event
             if (is_object($response) && isset($response->access_token)) {
                 $_SESSION['ACCESS_TOKEN'] = $response->access_token;
                 $g = new Gateway();
-                $g->init('https://graph.facebook.com/me?fields=id,name,email&access_token=' . $response->access_token);
+                $g->init('https://graph.facebook.com/me?fields=id,name,email,first_name,last_name,name_format&access_token=' . $response->access_token);
                 $response = @$g->exec();
                 
                 if ($response !== false) {
