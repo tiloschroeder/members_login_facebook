@@ -68,7 +68,3 @@ This form will redirect the user to facebook and then facebook will redirect the
 ### LICENSE ###
 
 MIT <http://deuxhuithuit.mit-license.org>
-
-*Voila !*
-
-Come say hi! -> <https://deuxhuithuit.com/>

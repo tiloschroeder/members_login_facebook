@@ -50,7 +50,7 @@ class eventmembers_facebook_login extends Event
     {
         $FB_APP_ID = Symphony::Configuration()->get('fb-app-id', 'members_facebook_login');
         $FB_APP_SECRET = Symphony::Configuration()->get('fb-app-secret', 'members_facebook_login');
-        if (is_array($_POST['member-facebook-action']) && isset($_POST['member-facebook-action']['login'])) {
+        if ( isset($_POST['member-facebook-action']['login']) ) {
             $_SESSION['OAUTH_SERVICE'] = 'facebook';
             $_SESSION['OAUTH_START_URL'] = $_REQUEST['redirect'];
             $_SESSION['OAUTH_CALLBACK_URL'] = $_REQUEST['callback'];
@@ -58,29 +58,29 @@ class eventmembers_facebook_login extends Event
             $_SESSION['OAUTH_TOKEN'] = null;
             $url = "https://www.facebook.com/dialog/oauth?client_id=$FB_APP_ID&scope=email&response_type=code&redirect_uri=" . $_REQUEST['callback'];
             redirect($url);
-        } elseif (isset($_POST['code'])) {
+        } elseif ( isset($_POST['code']) ) {
             $g = new Gateway();
             $g->init("https://graph.facebook.com/oauth/access_token?client_id=$FB_APP_ID&client_secret=$FB_APP_SECRET&code=" . $_REQUEST['code'].'&redirect_uri=' . $_SESSION['OAUTH_CALLBACK_URL']);
             
             $response = @$g->exec();
-            if ($response !== false) {
+            if ( $response !== false ) {
                 $response = @json_decode($response);
             }
-            if (!$response) {
+            if ( !$response ) {
                 throw new Exception('Failed to get the access token');
             }
             
-            if (is_object($response) && isset($response->access_token)) {
+            if ( is_object($response) && isset($response->access_token) ) {
                 $_SESSION['ACCESS_TOKEN'] = $response->access_token;
                 $g = new Gateway();
                 $g->init('https://graph.facebook.com/me?fields=id,name,email,first_name,last_name,name_format&access_token=' . $response->access_token);
                 $response = @$g->exec();
                 
-                if ($response !== false) {
+                if ( $response !== false ) {
                     $response = json_decode($response);
                 }
                 
-                if (is_object($response) && isset($response->name)) {
+                if ( is_object($response) && isset($response->name) ) {
                     $_SESSION['OAUTH_TIMESTAMP'] = time();
                     $_SESSION['OAUTH_SERVICE'] = 'facebook';
                     $_SESSION['ACCESS_TOKEN_SECRET'] = null;
@@ -89,15 +89,15 @@ class eventmembers_facebook_login extends Event
                     $_SESSION['OAUTH_USER_IMG'] = 'https://graph.facebook.com/' . $response->id . '/picture';
                     
                     $city = '';
-                    if (isset($response->hometown)) {
+                    if ( isset($response->hometown) ) {
                         $city = $response->hometown->name;
-                    } else if (isset($response->location)) {
+                    } else if ( isset($response->location) ) {
                         $city = $response->location->name;
                     }
                     
                     $_SESSION['OAUTH_USER_CITY'] = $city;
                     $_SESSION['OAUTH_USER_EMAIL'] = $response->email;
-                    if (empty($response->email)) {
+                    if ( empty($response->email) ) {
                         throw new Exception('User did not gave email permission');
                     }
                     $edriver = Symphony::ExtensionManager()->create('members');
@@ -106,7 +106,7 @@ class eventmembers_facebook_login extends Event
                     $mdriver = $edriver->getMemberDriver();
                     $email = $response->email;
                     $m = $femail->fetchMemberIDBy($email);
-                    if (!$m) {
+                    if ( !$m ) {
                         $m = new Entry();
                         $m->set('section_id', $_SESSION['OAUTH_MEMBERS_SECTION_ID']);
                         $m->setData($femail->get('id'), array('value' => $email));
@@ -117,7 +117,7 @@ class eventmembers_facebook_login extends Event
                     $login = $mdriver->login(array(
                         'email' => $email
                     ));
-                    if ($login) {
+                    if ( $login ) {
                         redirect($_SESSION['OAUTH_START_URL']);
                     } else {
                         throw new Exception('Facebook login failed');
@@ -135,8 +135,7 @@ class eventmembers_facebook_login extends Event
                 $_SESSION['OAUTH_TOKEN'] = null;
                 session_destroy();
             }
-        } elseif (is_array($_POST['member-facebook-action']) && isset($_POST['member-facebook-action']['logout']) ||
-                  is_array($_POST['member-action']) && isset($_POST['member-action']['logout'])) {
+        } elseif ( isset($_POST['member-facebook-action']['logout']) || isset($_POST['member-action']['logout']) ) {
             $_SESSION['OAUTH_SERVICE'] = null;
             $_SESSION['OAUTH_START_URL'] = null;
             $_SESSION['OAUTH_MEMBERS_SECTION_ID'] = null;

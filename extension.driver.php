@@ -84,13 +84,13 @@ class extension_members_login_facebook extends Extension
 
     public function membersLogin(array $context)
     {
-        if ($context['is-logged-in']) {
+        if ( $context['is-logged-in'] ) {
             return;
         }
-        if ($_SESSION['OAUTH_SERVICE'] !== 'facebook') {
+        if ( $_SESSION['OAUTH_SERVICE'] !== 'facebook' ) {
             return;
         }
-        if (empty($_SESSION['OAUTH_MEMBER_ID'])) {
+        if ( empty($_SESSION['OAUTH_MEMBER_ID']) ) {
             return;
         }
         $context['is-logged-in'] = $_SESSION['OAUTH_TIMESTAMP'] + TWO_WEEKS > time();
